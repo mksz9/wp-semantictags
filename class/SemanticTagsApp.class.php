@@ -7,13 +7,13 @@ if (!function_exists('add_filter')) {
     exit();
 }
 
-class App
+class SemanticTagsApp
 {
     /**
      * The main routine of the plugin
      * @return void
      */
-    public function main()
+    public static function main()
     {
 
     }
