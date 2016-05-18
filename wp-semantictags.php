@@ -38,6 +38,7 @@ function semantictags_auto_load($class)
 
     if ($classes === null) {
         $classes = array(
+            'ARC2'                => SEMANTICTAGS_PATH . 'library/arc2/ARC2.php',
             'ConceptTypeChecker'  => SEMANTICTAGS_PATH . 'class/ConceptTypeChecker.class.php',
             'DataHandler'         => SEMANTICTAGS_PATH . 'class/DataHandler.class.php',
             'Property'            => SEMANTICTAGS_PATH . 'class/Property.class.php',
@@ -47,10 +48,6 @@ function semantictags_auto_load($class)
             'SemanticTagsApp'     => SEMANTICTAGS_PATH . 'class/SemanticTagsApp.class.php',
             'TypeChecker'         => SEMANTICTAGS_PATH . 'interface/TypeChecker.interface.php',
         );
-        /**
-         * ToDo:
-         * Add the external libraries ARC2 here to autoloading + include them as git submodules
-         */
     }
 
     if (isset($classes[$class])) {
