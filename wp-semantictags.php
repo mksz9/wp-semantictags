@@ -44,7 +44,7 @@ function semantictags_auto_load($class)
             'PropertyTypeChecker' => SEMANTICTAGS_PATH . 'class/PropertyTypeChecker.class.php',
             'SearchDataHandler'   => SEMANTICTAGS_PATH . 'class/SearchDataHandler.class.php',
             'SemanticTag'         => SEMANTICTAGS_PATH . 'class/SemanticTag.class.php',
-            'SemanticTagsApp'     => SEMANTICTAGS_PATH . 'class/SemanticTagsApp.php',
+            'SemanticTagsApp'     => SEMANTICTAGS_PATH . 'class/SemanticTagsApp.class.php',
             'TypeChecker'         => SEMANTICTAGS_PATH . 'interface/TypeChecker.interface.php',
         );
         /**
