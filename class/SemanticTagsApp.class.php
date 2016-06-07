@@ -89,6 +89,15 @@ class SemanticTagsApp
         global $pagenow;
         if ('post.php' == $pagenow) {
             wp_enqueue_script('semantictags_tagconfigurationonpost_js', plugin_dir_url(SEMANTICTAGS_FILE) . 'js/tagConfiguratorOnPost.js');
+            //localization of loaded script-handle:
+            wp_localize_script('semantictags_tagconfigurationonpost_js', 'objectL10n', array(
+                'edit'             => __('edit', 'semantictags'),
+                'overlay_headline' => __('Semantic configuration', 'semantictags'),
+                'semantictag_name' => __('Name', 'semantictags'),
+                'semantictag_type' => __('Datatype', 'semantictags'),
+                'semantictag_desc' => __('Description', 'semantictags'),
+                'semantictag_save' => __('Save', 'semantictags'),
+            ));
             wp_enqueue_style('semantictags_tagconfigurationonpost_css', plugin_dir_url(SEMANTICTAGS_FILE) . 'css/tagConfiguratorOnPost.css');
         }
     }
