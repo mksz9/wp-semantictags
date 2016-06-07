@@ -14,6 +14,10 @@ class ConceptTypeChecker implements TypeChecker
 
     }
 
+    /**
+     * Retrieving all concepts from used vocabulary
+     * @return void
+     */
     public static function getAllConcepts()
     {
         $conceptClasses = SemanticTagsHelper::getVocabularyClasses();

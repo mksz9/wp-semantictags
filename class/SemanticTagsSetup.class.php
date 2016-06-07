@@ -16,7 +16,6 @@ class SemanticTagsSetup
     public static function installDatabase()
     {
         $store = SemanticTagsHelper::getARC2Store();
-
         if (!$store->isSetUp()) {
             $store->setUp();
         }

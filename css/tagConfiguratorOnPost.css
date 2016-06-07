@@ -1,3 +1,11 @@
+/*  
+========================================================
+
+Style declarations for the area in the post edit section
+
+========================================================
+*/
+
 .tagchecklist .ntdelbutton, .tagchecklist .nteditbutton {
 	margin: 0;
 	cursor: pointer;

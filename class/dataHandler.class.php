@@ -27,7 +27,7 @@ class DataHandler
     }
 
     /**
-     * Saves a semanticTag object in the database
+     * Saves a SemanticTag object in the database
      * @param SemanticTag $tag
      * @return void
      */
@@ -46,23 +46,23 @@ class DataHandler
              */
         }
 
+        //insert the concept type class
         $query = 'prefix schema: <http://www.schema.org/>
                 INSERT INTO <//tag> {
                 <//tag#' . $tag->getConceptId() . '> rdf:Type ' . $tag->getConcept() . '}';
-
         $store->query($query);
 
+        //inserting all properties of the tag
         foreach ($tag->getAllProperties() as $property_p => $property_o) {
             $query = 'prefix schema: <http://www.schema.org/>
                 INSERT INTO <//tag> {
                 <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' "' . $property_o . '"}';
-
             $store->query($query);
         }
     }
 
     /**
-     * Removes a semanticTag object from the database
+     * Removes a SemanticTag object from the database
      * @param SemanticTag $tag
      * @param string $property optional - whether removing only property from a tag
      * @return void
@@ -93,13 +93,15 @@ class DataHandler
     }
 
     /**
-     * Loads an existing existing semnanticTag based on a conceptId
+     * Loads an existing existing SemanticTag based on a conceptId
      * @param int $conceptId The ID of the concept to load
-     * @return void
+     * @return SemanticTag|boolean
      */
     public function loadTagByConceptId($conceptId)
     {
-        $store       = SemanticTagsHelper::getARC2Store();
+        $store = SemanticTagsHelper::getARC2Store();
+
+        //creating the new object to fill with information
         $semanticTag = new SemanticTag();
 
         $query = 'prefix schema: <http://www.schema.org/>
@@ -113,6 +115,7 @@ class DataHandler
             return false;
         }
 
+        //setting the conceptId in the object
         $semanticTag->setConceptId($conceptId);
 
         /**
@@ -133,7 +136,6 @@ class DataHandler
                     break;
             }
         }
-
         return $semanticTag;
     }
 }

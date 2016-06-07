@@ -34,39 +34,48 @@ class SemanticTagsHelper implements SemanticTagsEnums
         return ARC2::getStore($config);
     }
 
+    /**
+     * Returns all classes of the configured vocabulary in alphabetical order
+     * @return array
+     */
     public static function getVocabularyClasses()
     {
-        $semanticVocabularyFile = SEMANTICTAGS_PATH . '../../uploads/' . SEMANTICTAGS_PLUGIN_NAME . '/' . SemanticTagsApp::VOCABULARY_PREFIX . '.ttl';
-        $parser                 = ARC2::getRDFParser();
+        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsApp::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . SemanticTagsApp::VOCABULARY_PREFIX . '.ttl';
+        //get the ARC2 parser and parse the vocabulary
+        $parser = ARC2::getRDFParser();
         $parser->parse($semanticVocabularyFile);
         $triples = $parser->getTriples();
         $classes = array();
         foreach ($triples as $triple) {
+            //only extract informations where predicate is declared as a RDF Type and the object is type of a RDF Class
             if ($triple['p'] == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && $triple['o'] == 'http://www.w3.org/2000/01/rdf-schema#Class') {
                 /**
+                 * ToDo:
                  * Get information about vocabulary from options
                  */
                 $classes[] = SemanticTag::SCHEMA_PREFIX . ':' . substr($triple['s'], strlen(self::SCHEMA_PREFIX_WITHOUT_WWW));
             }
         }
+        //eliminate duplicate entries (maybe possible at some vocabularies), and sort them before returning:
         $classes = array_unique($classes);
         sort($classes);
         return $classes;
     }
 
     /**
-     * Fetches all semantic tags by a post ID
+     * Fetches all SemanticTags by a given post ID
      * @param integer $id
-     * @return Array
+     * @return array
      */
     public static function getSemanticTagsByPostId($id)
     {
         $semanticTags = array();
-        $tagIds       = wp_get_post_tags($id, array('fields' => 'ids'));
-        $dh           = DataHandler::getInstance();
-
+        //get all the tag IDs belonging to a post:
+        $tagIds = wp_get_post_tags($id, array('fields' => 'ids'));
+        $dh     = DataHandler::getInstance();
         foreach ($tagIds as $id) {
             if ($dh->conceptIdExists($id)) {
+                //loading information about concept from Triple-Store
                 $semanticTags[] = $dh->loadTagByConceptId($id);
             }
         }

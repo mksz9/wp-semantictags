@@ -20,8 +20,14 @@ class SemanticTag
     const SCHEMA_URI    = 'http://www.schema.org/';
     const SCHEMA_PREFIX = 'schema';
 
+    /**
+     * Setter for the concept class (URI) of the SemanticTag object
+     * @param string $conceptURI
+     * @return void
+     */
     public function setConcept($conceptURI)
     {
+        //check whether the conceptURI comes prefixed or full descriptive and convert before storing
         if (strpos($conceptURI, self::SCHEMA_URI) !== false) {
             $this->concept = self::SCHEMA_PREFIX . ':' . substr($conceptURI, strlen(self::SCHEMA_URI));
         } else {
@@ -29,26 +35,50 @@ class SemanticTag
         }
     }
 
+    /**
+     * Getter of concept URI
+     * @return string
+     */
     public function getConcept()
     {
         return $this->concept;
     }
 
+    /**
+     * Setter of ConceptId
+     * @param int $id
+     * @return void
+     */
     public function setConceptId($id)
     {
         $this->conceptId = $id;
     }
 
+    /**
+     * Getter of ConceptId
+     * @return int
+     */
     public function getConceptId()
     {
         return $this->conceptId;
     }
 
+    /**
+     * Adds a property to the current SemanticTag object
+     * @param string $predicate
+     * @param string $object
+     * @return void
+     */
     public function addProperty($predicate, $object)
     {
         $this->properties[$predicate] = $object;
     }
 
+    /**
+     * Returns the value of a given property type
+     * @param string $type
+     * @return array
+     */
     public function getProperty($type)
     {
         if (array_key_exists($type, $this->properties)) {
@@ -57,6 +87,10 @@ class SemanticTag
         return array();
     }
 
+    /**
+     * Returns all given property of the current SemanticTag object
+     * @return array
+     */
     public function getAllProperties()
     {
         return $this->properties;

@@ -46,7 +46,6 @@ function semantictags_auto_load($class)
             'ARC2'                => SEMANTICTAGS_PATH . 'library/arc2/ARC2.php',
             'ConceptTypeChecker'  => SEMANTICTAGS_PATH . 'class/ConceptTypeChecker.class.php',
             'DataHandler'         => SEMANTICTAGS_PATH . 'class/DataHandler.class.php',
-            'Property'            => SEMANTICTAGS_PATH . 'class/Property.class.php',
             'PropertyTypeChecker' => SEMANTICTAGS_PATH . 'class/PropertyTypeChecker.class.php',
             'SearchDataHandler'   => SEMANTICTAGS_PATH . 'class/SearchDataHandler.class.php',
             'SemanticTag'         => SEMANTICTAGS_PATH . 'class/SemanticTag.class.php',

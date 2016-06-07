@@ -15,6 +15,7 @@ class SemanticTagsApp
      */
     const VOCABULARY        = 'https://ckannet-storage.commondatastorage.googleapis.com/2015-03-18T17:25:40.358Z/schema-org.ttl';
     const VOCABULARY_PREFIX = 'schema';
+    const UPLOAD_DIR        = '/../../uploads/'; #the directory of the wp upload dir relative to the plugin folder
     /**
      * The main routine of the plugin
      * @return void
@@ -22,12 +23,15 @@ class SemanticTagsApp
     public static function main()
     {
 
-        //check if schema file exists, if not than download to upload dir
-        if (!file_exists(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl')) {
-            if (!is_dir(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME)) {
-                mkdir(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME);
+        //check if schema file exists, if not than download it from remote to upload dir
+        if (!file_exists(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl')) {
+            //take responsibility to provide the plugins upload folder
+            if (!is_dir(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME)) {
+                mkdir(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME);
             }
+            //retrieving vocabulary:
             $vocabulary = file_get_contents(self::VOCABULARY);
+            //storing vocabulary:
             file_put_contents(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl', $vocabulary);
         }
 
@@ -90,7 +94,7 @@ class SemanticTagsApp
     }
 
     /**
-     * Processes configured semanticTags after editing a post
+     * Processes configured SemanticTags after editing a post
      * @param integer $post_id
      * @return void
      */
@@ -98,16 +102,22 @@ class SemanticTagsApp
     {
         if (array_key_exists('semantictagsdata', $_REQUEST)) {
             $postedSemanticTagData = $_REQUEST['semantictagsdata'];
-            $tempData              = str_replace("\\", "", $postedSemanticTagData);
+            //unescaping data:
+            $tempData = str_replace("\\", "", $postedSemanticTagData);
+            //decode JSON data:
             $postedSemanticTagData = json_decode($tempData);
 
             foreach ($postedSemanticTagData as $data) {
-                $term        = get_term_by('name', $data->name, 'post_tag');
+                //get the tag information to each configured SemanticTag:
+                $term = get_term_by('name', $data->name, 'post_tag');
+                //create the new SemanticTag object which gets stored:
                 $semanticTag = new SemanticTag();
+                //set its informations to store:
                 $semanticTag->setConcept($data->type);
                 $semanticTag->setConceptId($term->term_id);
                 $semanticTag->addProperty('rdfs:label', $data->name);
                 $semanticTag->addProperty('rdfs:comment', $data->desc);
+                //save the SemanticTag with the DataHandler:
                 $dh = DataHandler::getInstance();
                 $dh->saveTag($semanticTag);
             }
@@ -121,12 +131,13 @@ class SemanticTagsApp
      */
     public static function loadConfiguredTags($post)
     {
-        $tags       = SemanticTagsHelper::getSemanticTagsByPostId($post->ID);
+        //retrieve all SemanticTags which belong to a post:
+        $tags = SemanticTagsHelper::getSemanticTagsByPostId($post->ID);
+        //build the structure which is required in frontend, for processing with JS:
         $simplified = array();
         foreach ($tags as $tag) {
             $simplified[] = (object) array('name' => $tag->getProperty('rdfs:label'), 'type' => $tag->getConcept(), 'desc' => $tag->getProperty('rdfs:comment'));
         }
-
         echo "<input type=\"hidden\" name=\"semantictagsdata\" value='" . json_encode($simplified) . "' />";
     }
 
