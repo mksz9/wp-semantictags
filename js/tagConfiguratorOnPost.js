@@ -112,10 +112,9 @@ jQuery(document).ready(function() {
         //building the overlays in which the configuration takes part
         tagsDiv = jQuery('.tagsdiv');
         tagName = getTagFromElement(tmpXButton.parent());
-        val = [{
-            type: '',
-            desc: ''
-        }];
+        val = [];
+        val.type = '';
+        val.desc = '';
         if (semanticData.hasTag(tagName)) {
             tagsData = semanticData.getTag(tagName);
             val.type = tagsData.type;
