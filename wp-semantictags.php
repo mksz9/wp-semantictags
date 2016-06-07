@@ -28,6 +28,11 @@ if (!defined('SEMANTICTAGS_PATH')) {
     define('SEMANTICTAGS_PATH', plugin_dir_path(SEMANTICTAGS_FILE));
 }
 
+//Plugin name:
+if (!defined('SEMANTICTAGS_PLUGIN_NAME')) {
+    define('SEMANTICTAGS_PLUGIN_NAME', 'semantictags');
+}
+
 /**
  * Autoloading of all used classes and interfaces
  */
@@ -46,7 +51,10 @@ function semantictags_auto_load($class)
             'SearchDataHandler'   => SEMANTICTAGS_PATH . 'class/SearchDataHandler.class.php',
             'SemanticTag'         => SEMANTICTAGS_PATH . 'class/SemanticTag.class.php',
             'SemanticTagsApp'     => SEMANTICTAGS_PATH . 'class/SemanticTagsApp.class.php',
+            'SemanticTagsHelper'  => SEMANTICTAGS_PATH . 'class/SemanticTagsHelper.class.php',
+            'SemanticTagsSetup'   => SEMANTICTAGS_PATH . 'class/SemanticTagsSetup.class.php',
             'TypeChecker'         => SEMANTICTAGS_PATH . 'interface/TypeChecker.interface.php',
+            'SemanticTagsEnums'   => SEMANTICTAGS_PATH . 'interface/SemanticTagsEnums.interface.php',
         );
     }
 

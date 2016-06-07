@@ -9,5 +9,15 @@ if (!function_exists('add_filter')) {
 
 class ConceptTypeChecker implements TypeChecker
 {
+    public function check()
+    {
 
+    }
+
+    public static function getAllConcepts()
+    {
+        $conceptClasses = SemanticTagsHelper::getVocabularyClasses();
+        echo json_encode($conceptClasses);
+        die();
+    }
 }

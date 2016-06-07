@@ -13,8 +13,5 @@ interface TypeChecker
      * Gives answer about correctness of a vocabulary type
      * @return bool
      */
-    public function check()
-    {
-
-    }
+    public function check();
 }
