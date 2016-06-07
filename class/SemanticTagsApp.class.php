@@ -87,7 +87,7 @@ class SemanticTagsApp implements SemanticTagsEnums
     public static function addHeadfiles()
     {
         global $pagenow;
-        if ('post.php' == $pagenow) {
+        if ('post.php' == $pagenow || 'post-new.php' == $pagenow) {
             wp_enqueue_script('semantictags_tagconfigurationonpost_js', plugin_dir_url(SEMANTICTAGS_FILE) . 'js/tagConfiguratorOnPost.js');
             //localization of loaded script-handle:
             wp_localize_script('semantictags_tagconfigurationonpost_js', 'objectL10n', array(
