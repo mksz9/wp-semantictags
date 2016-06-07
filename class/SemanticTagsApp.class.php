@@ -7,7 +7,7 @@ if (!function_exists('add_filter')) {
     exit();
 }
 
-class SemanticTagsApp
+class SemanticTagsApp implements SemanticTagsEnums
 {
     /**
      * ToDo
@@ -15,7 +15,7 @@ class SemanticTagsApp
      */
     const VOCABULARY        = 'https://ckannet-storage.commondatastorage.googleapis.com/2015-03-18T17:25:40.358Z/schema-org.ttl';
     const VOCABULARY_PREFIX = 'schema';
-    const UPLOAD_DIR        = '/../../uploads/'; #the directory of the wp upload dir relative to the plugin folder
+
     /**
      * The main routine of the plugin
      * @return void
@@ -24,10 +24,10 @@ class SemanticTagsApp
     {
 
         //check if schema file exists, if not than download it from remote to upload dir
-        if (!file_exists(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl')) {
+        if (!file_exists(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl')) {
             //take responsibility to provide the plugins upload folder
-            if (!is_dir(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME)) {
-                mkdir(SEMANTICTAGS_PATH . self::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME);
+            if (!is_dir(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME)) {
+                mkdir(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME);
             }
             //retrieving vocabulary:
             $vocabulary = file_get_contents(self::VOCABULARY);

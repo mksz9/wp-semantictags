@@ -40,7 +40,7 @@ class SemanticTagsHelper implements SemanticTagsEnums
      */
     public static function getVocabularyClasses()
     {
-        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsApp::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . SemanticTagsApp::VOCABULARY_PREFIX . '.ttl';
+        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . SemanticTagsApp::VOCABULARY_PREFIX . '.ttl';
         //get the ARC2 parser and parse the vocabulary
         $parser = ARC2::getRDFParser();
         $parser->parse($semanticVocabularyFile);
