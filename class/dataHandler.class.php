@@ -33,7 +33,8 @@ class DataHandler
      */
     public function saveTag(SemanticTag $tag)
     {
-        $store = SemanticTagsHelper::getARC2Store();
+        $store     = SemanticTagsHelper::getARC2Store();
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //when tag already exists and concept changes, then remove existing entries and properties
         if ($stored = $this->loadTagByConceptId($tag->getConceptId())) {
@@ -47,14 +48,14 @@ class DataHandler
         }
 
         //insert the concept type class
-        $query = 'prefix schema: <http://www.schema.org/>
+        $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                 INSERT INTO <//tag> {
                 <//tag#' . $tag->getConceptId() . '> rdf:Type ' . $tag->getConcept() . '}';
         $store->query($query);
 
         //inserting all properties of the tag
         foreach ($tag->getAllProperties() as $property_p => $property_o) {
-            $query = 'prefix schema: <http://www.schema.org/>
+            $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                 INSERT INTO <//tag> {
                 <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' "' . $property_o . '"}';
             $store->query($query);
@@ -81,9 +82,10 @@ class DataHandler
      */
     public function conceptIdExists($conceptId)
     {
-        $store = SemanticTagsHelper::getARC2Store();
+        $store     = SemanticTagsHelper::getARC2Store();
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
-        $query = 'prefix schema: <http://www.schema.org/>
+        $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
             SELECT *
             WHERE { <//tag#' . $conceptId . '> ?p ?o
             }';
@@ -99,12 +101,13 @@ class DataHandler
      */
     public function loadTagByConceptId($conceptId)
     {
-        $store = SemanticTagsHelper::getARC2Store();
+        $store     = SemanticTagsHelper::getARC2Store();
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //creating the new object to fill with information
         $semanticTag = new SemanticTag();
 
-        $query = 'prefix schema: <http://www.schema.org/>
+        $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
             SELECT *
             WHERE { <//tag#' . $conceptId . '> ?p ?o
             }';

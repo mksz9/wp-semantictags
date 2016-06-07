@@ -27,9 +27,12 @@ class SemanticTagsSetup
      */
     public static function uninstallDatabase()
     {
+        //removing store
         $store = SemanticTagsHelper::getARC2Store();
         if ($store->isSetUp()) {
             $store->drop();
         }
+        //removing settings
+        SemanticTagsOptions::removeOptions();
     }
 }

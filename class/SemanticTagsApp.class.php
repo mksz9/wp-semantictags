@@ -9,12 +9,6 @@ if (!function_exists('add_filter')) {
 
 class SemanticTagsApp implements SemanticTagsEnums
 {
-    /**
-     * ToDo
-     * - keep this in options
-     */
-    const VOCABULARY        = 'https://ckannet-storage.commondatastorage.googleapis.com/2015-03-18T17:25:40.358Z/schema-org.ttl';
-    const VOCABULARY_PREFIX = 'schema';
 
     /**
      * The main routine of the plugin
@@ -22,17 +16,18 @@ class SemanticTagsApp implements SemanticTagsEnums
      */
     public static function main()
     {
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //check if schema file exists, if not than download it from remote to upload dir
-        if (!file_exists(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl')) {
+        if (!file_exists(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . $vocabular['prefix'] . '.ttl')) {
             //take responsibility to provide the plugins upload folder
             if (!is_dir(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME)) {
                 mkdir(SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME);
             }
             //retrieving vocabulary:
-            $vocabulary = file_get_contents(self::VOCABULARY);
+            $vocabulary = file_get_contents($vocabular['remote']);
             //storing vocabulary:
-            file_put_contents(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME . '/' . self::VOCABULARY_PREFIX . '.ttl', $vocabulary);
+            file_put_contents(SEMANTICTAGS_PATH . '/../../uploads/' . SEMANTICTAGS_PLUGIN_NAME . '/' . $vocabular['prefix'] . '.ttl', $vocabulary);
         }
 
         //load language
@@ -40,6 +35,10 @@ class SemanticTagsApp implements SemanticTagsEnums
             'SemanticTagsApp',
             'semanticTagsLoadTextdomain',
         ));
+
+        //load and register settings
+        add_action('admin_menu', array('SemanticTagsOptions', 'addAdminMenu'));
+        add_action('admin_init', array('SemanticTagsOptions', 'initializeSettings'));
 
         //add headfiles if on editor
         add_action('admin_enqueue_scripts', array('SemanticTagsApp', 'addHeadfiles'));
@@ -68,7 +67,6 @@ class SemanticTagsApp implements SemanticTagsEnums
 
         //retrieving all datatypes from vocabulary
         add_action('wp_ajax_semantictags_retrieve_datatypes', array('ConceptTypeChecker', 'getAllConcepts'));
-
     }
 
     /**

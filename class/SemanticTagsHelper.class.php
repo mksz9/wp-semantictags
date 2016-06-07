@@ -10,8 +10,6 @@ if (!function_exists('add_filter')) {
 class SemanticTagsHelper implements SemanticTagsEnums
 {
 
-    const SCHEMA_PREFIX_WITHOUT_WWW = 'http://schema.org/';
-
     /**
      * Returns an instance of the ARC2 store model
      * @return ARC2_Store
@@ -40,7 +38,8 @@ class SemanticTagsHelper implements SemanticTagsEnums
      */
     public static function getVocabularyClasses()
     {
-        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . SemanticTagsApp::VOCABULARY_PREFIX . '.ttl';
+        $vocabular              = SemanticTagsOptions::getVocabularConfiguration();
+        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . $vocabular['prefix'] . '.ttl';
         //get the ARC2 parser and parse the vocabulary
         $parser = ARC2::getRDFParser();
         $parser->parse($semanticVocabularyFile);
@@ -49,11 +48,7 @@ class SemanticTagsHelper implements SemanticTagsEnums
         foreach ($triples as $triple) {
             //only extract informations where predicate is declared as a RDF Type and the object is type of a RDF Class
             if ($triple['p'] == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && $triple['o'] == 'http://www.w3.org/2000/01/rdf-schema#Class') {
-                /**
-                 * ToDo:
-                 * Get information about vocabulary from options
-                 */
-                $classes[] = SemanticTag::SCHEMA_PREFIX . ':' . substr($triple['s'], strlen(self::SCHEMA_PREFIX_WITHOUT_WWW));
+                $classes[] = $vocabular['prefix'] . ':' . substr($triple['s'], strlen($vocabular['uri']));
             }
         }
         //eliminate duplicate entries (maybe possible at some vocabularies), and sort them before returning:

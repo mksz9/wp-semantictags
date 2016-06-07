@@ -14,22 +14,17 @@ class SemanticTag
     protected $properties = array();
 
     /**
-     * ToDo:
-     * in Optionen auslagern!
-     */
-    const SCHEMA_URI    = 'http://www.schema.org/';
-    const SCHEMA_PREFIX = 'schema';
-
-    /**
      * Setter for the concept class (URI) of the SemanticTag object
      * @param string $conceptURI
      * @return void
      */
     public function setConcept($conceptURI)
     {
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
+
         //check whether the conceptURI comes prefixed or full descriptive and convert before storing
-        if (strpos($conceptURI, self::SCHEMA_URI) !== false) {
-            $this->concept = self::SCHEMA_PREFIX . ':' . substr($conceptURI, strlen(self::SCHEMA_URI));
+        if (strpos($conceptURI, $vocabular['uri']) !== false) {
+            $this->concept = $vocabular['prefix'] . ':' . substr($conceptURI, strlen($vocabular['uri']));
         } else {
             $this->concept = $conceptURI;
         }
