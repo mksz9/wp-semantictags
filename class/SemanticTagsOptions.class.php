@@ -11,10 +11,7 @@ class SemanticTagsOptions
 {
     public static function addAdminMenu()
     {
-
         $options = get_option('semantictags_settings_vocabulary');
-        error_log(print_r($options, 1));
-
         add_options_page(__('SemanticTags Options', 'semantictags'), 'SemanticTags', 'manage_options', 'semantictags', array('SemanticTagsOptions', 'renderOptionsPage'));
     }
 
@@ -100,6 +97,5 @@ class SemanticTagsOptions
             'prefix' => $options['semantictags_settings_vocabulary_prefix'],
             'remote' => $options['semantictags_settings_vocabulary_ttl'],
         );
-
     }
 }
