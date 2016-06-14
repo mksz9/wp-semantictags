@@ -49,6 +49,12 @@ class SemanticTagsApp implements SemanticTagsEnums
         //load configured semanticTags
         add_action('dbx_post_sidebar', array('SemanticTagsApp', 'loadConfiguredTags'));
 
+        //load semanticTags options on tag editing page
+        add_action('edit_tag_form_fields', array('SemanticTagsApp', 'hookTagEditPage'));
+
+        //save semanticTags options on tag editing page
+        add_filter('wp_update_term_parent', array('SemanticTagsApp', 'processSemanticTagsOnTagEdit'), 10, 5);
+
         //on plugin activation (create db tables)
         register_activation_hook(SEMANTICTAGS_FILE, array(
             'SemanticTagsSetup',
@@ -97,6 +103,8 @@ class SemanticTagsApp implements SemanticTagsEnums
                 'semantictag_save' => __('Save', 'semantictags'),
             ));
             wp_enqueue_style('semantictags_tagconfigurationonpost_css', plugin_dir_url(SEMANTICTAGS_FILE) . 'css/tagConfiguratorOnPost.css');
+        } else if ('edit-tags.php' == $pagenow) {
+            wp_enqueue_script('semantictags_tagconfigurationontagedit_js', plugin_dir_url(SEMANTICTAGS_FILE) . 'js/tagConfiguratorOnTagEdit.js');
         }
     }
 
@@ -132,6 +140,34 @@ class SemanticTagsApp implements SemanticTagsEnums
     }
 
     /**
+     * Processes configured SemanticTags after editing a tag on its editing page
+     * @param int $args_parent
+     * @param int $term_id
+     * @param string $taxonomy
+     * @param array $parsed_args
+     * @param array $args
+     * @return int
+     */
+    public function processSemanticTagsOnTagEdit($args_parent, $term_id, $taxonomy, $parsed_args, $args)
+    {
+        $semanticTag = new SemanticTag();
+        $dh          = DataHandler::getInstance();
+        if (isset($args['st_type']) && $args['st_type'] != '') {
+            //set its informations to store:
+            $semanticTag->setConcept($args['st_type']);
+            $semanticTag->setConceptId($args['term_id']);
+            $semanticTag->addProperty('rdfs:label', $args['name']);
+            $semanticTag->addProperty('rdfs:comment', $args['st_desc']);
+            //save the SemanticTag with the DataHandler:
+            $dh->saveTag($semanticTag);
+        } else {
+            $semanticTag->setConceptId($args['term_id']);
+            $dh->deleteTag($semanticTag);
+        }
+        return $args_parent;
+    }
+
+    /**
      * Loads existing and configured semantic data for tags before loading post editor
      * @param type $post
      * @return void
@@ -146,6 +182,58 @@ class SemanticTagsApp implements SemanticTagsEnums
             $simplified[] = (object) array('name' => $tag->getProperty('rdfs:label'), 'type' => $tag->getConcept(), 'desc' => $tag->getProperty('rdfs:comment'));
         }
         echo "<input type=\"hidden\" name=\"semantictagsdata\" value='" . json_encode($simplified) . "' />";
+    }
+
+    /**
+     * Provides the semanticTag options on the tag editing page on backend of Wordpress
+     * @param WP_Term $tag
+     * @return void
+     */
+    public static function hookTagEditPage($tag)
+    {
+        $dh = DataHandler::getInstance();
+
+        $currentSemanticDataType = $currentSemanticDescription = $currentSemanticConncetions = '';
+
+        //retrieve the semanticTag object to the post tag
+        if ($semanticTag = $dh->loadTagByConceptId($tag->term_id)) {
+
+            $properties                 = $semanticTag->getAllProperties();
+            $currentSemanticDataType    = $semanticTag->getConcept();
+            $currentSemanticDescription = $properties['rdfs:comment'];
+            //fill with the conncetions
+            $connections = array();
+            foreach ($properties as $property => $val) {
+                if ($property != 'rdfs:comment' && $property != 'rdfs:label') {
+                    $conncetions[] = array('property' => $property, 'value' => $val);
+                }
+            }
+            $currentSemanticConncetions = json_encode($connections);
+        }
+
+        //output the form fields
+        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Datatype', 'semantictags') . '</label></th><td><select name="st_type">' . self::generateDataTypeSelect($currentSemanticDataType) . '</select><p class="description">' . __('The datatype of the tag.', 'semantictags') . '</p></td>
+        </tr>';
+        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Description', 'semantictags') . '</label></th><td><textarea name="st_desc">' . $currentSemanticDescription . '</textarea><p class="description">' . __('Internal description for the semantic tag.', 'semantictags') . '</p>
+            <input type="hidden" name="st_connections" value="' . $currentSemanticConncetions . '" /></td>
+        </tr>';
+    }
+
+    /**
+     * Generates the select input depending on the current choosed datatype + all available datatypes in vocabulary
+     * @param string $current
+     * @return string
+     */
+    public static function generateDataTypeSelect($current)
+    {
+        $vocabularyClasses = SemanticTagsHelper::getVocabularyClasses();
+        $returnOptions     = '<option value=""></option>';
+        foreach ($vocabularyClasses as $class) {
+            $splitted = explode(':', $class);
+            $selected = ($class == $current) ? ' selected' : '';
+            $returnOptions .= '<option value="' . $class . '"' . $selected . '>' . $splitted[1] . '</option>';
+        }
+        return $returnOptions;
     }
 
 }
