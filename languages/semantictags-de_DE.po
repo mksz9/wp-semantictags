@@ -1,0 +1,77 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2016-06-14 18:03+0200\n"
+"PO-Revision-Date: 2016-06-14 18:06+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __\n"
+"X-Poedit-SearchPath-0: .\n"
+
+#: class/SemanticTagsApp.class.php:98
+msgid "edit"
+msgstr "bearbeiten"
+
+#: class/SemanticTagsApp.class.php:99
+msgid "Semantic configuration"
+msgstr "Konfiguration der Semantik"
+
+#: class/SemanticTagsApp.class.php:100
+msgid "Name"
+msgstr "Name"
+
+#: class/SemanticTagsApp.class.php:101 class/SemanticTagsApp.class.php:215
+msgid "Datatype"
+msgstr "Datentyp"
+
+#: class/SemanticTagsApp.class.php:102 class/SemanticTagsApp.class.php:217
+msgid "Description"
+msgstr "Beschreibung"
+
+#: class/SemanticTagsApp.class.php:103
+msgid "Save"
+msgstr "Speichern"
+
+#: class/SemanticTagsApp.class.php:215
+msgid "The datatype of the tag."
+msgstr "Der Datentyp des Tags."
+
+#: class/SemanticTagsApp.class.php:217
+msgid "Internal description for the semantic tag."
+msgstr "Interne Beschreibung für den semantischen Tag."
+
+#: class/SemanticTagsOptions.class.php:15
+#: class/SemanticTagsOptions.class.php:21
+msgid "SemanticTags Options"
+msgstr "SemanticTags Optionen"
+
+#: class/SemanticTagsOptions.class.php:34
+msgid "Vocabulary settings"
+msgstr "Vokabulareinstellungen"
+
+#: class/SemanticTagsOptions.class.php:41
+msgid "URI of the used vocabulary"
+msgstr "URI des zu verwendenden Vokabulars"
+
+#: class/SemanticTagsOptions.class.php:49
+msgid "Prefix of the used vocabular URI"
+msgstr "Prefix der zu verwendenden URI des Vokabulars"
+
+#: class/SemanticTagsOptions.class.php:57
+msgid "URL of the turtle (.ttl) file for the vocabulary"
+msgstr "URL der Turtle Datei (.ttl) für das Vokabular"
+
+#: class/SemanticTagsOptions.class.php:89
+msgid ""
+"Please make the configuration of the intended vocabulary before you can use "
+"the semantictags plugin."
+msgstr ""
+"Bitte konfigurieren Sie das SemanticTags Plugin für das zu verwendende "
+"Vokabular, damit Sie damit arbeiten können."
