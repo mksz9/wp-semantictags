@@ -57,7 +57,7 @@ class DataHandler
         foreach ($tag->getAllProperties() as $property_p => $property_o) {
             $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                 INSERT INTO <//tag> {
-                <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' "' . $property_o . '"}';
+                <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' "' . $property_o['o'] . '"}';
             $store->query($query);
         }
     }
@@ -132,10 +132,10 @@ class DataHandler
                     $semanticTag->setConcept($row['o']);
                     break;
                 case 'http://www.w3.org/2000/01/rdf-schema#label':
-                    $semanticTag->addProperty('rdfs:label', $row['o']);
+                    $semanticTag->addProperty('rdfs:label', $row['o'], $row['o type']);
                     break;
                 case 'http://www.w3.org/2000/01/rdf-schema#comment':
-                    $semanticTag->addProperty('rdfs:comment', $row['o']);
+                    $semanticTag->addProperty('rdfs:comment', $row['o'], $row['o type']);
                     break;
             }
         }

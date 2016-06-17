@@ -130,8 +130,8 @@ class SemanticTagsApp implements SemanticTagsEnums
                 //set its informations to store:
                 $semanticTag->setConcept($data->type);
                 $semanticTag->setConceptId($term->term_id);
-                $semanticTag->addProperty('rdfs:label', $data->name);
-                $semanticTag->addProperty('rdfs:comment', $data->desc);
+                $semanticTag->addProperty('rdfs:label', $data->name, 'literal');
+                $semanticTag->addProperty('rdfs:comment', $data->desc, 'literal');
                 //save the SemanticTag with the DataHandler:
                 $dh = DataHandler::getInstance();
                 $dh->saveTag($semanticTag);
@@ -148,7 +148,7 @@ class SemanticTagsApp implements SemanticTagsEnums
      * @param array $args
      * @return int
      */
-    public function processSemanticTagsOnTagEdit($args_parent, $term_id, $taxonomy, $parsed_args, $args)
+    public static function processSemanticTagsOnTagEdit($args_parent, $term_id, $taxonomy, $parsed_args, $args)
     {
         $semanticTag = new SemanticTag();
         $dh          = DataHandler::getInstance();
@@ -156,8 +156,8 @@ class SemanticTagsApp implements SemanticTagsEnums
             //set its informations to store:
             $semanticTag->setConcept($args['st_type']);
             $semanticTag->setConceptId($args['term_id']);
-            $semanticTag->addProperty('rdfs:label', $args['name']);
-            $semanticTag->addProperty('rdfs:comment', $args['st_desc']);
+            $semanticTag->addProperty('rdfs:label', $args['name'], 'literal');
+            $semanticTag->addProperty('rdfs:comment', $args['st_desc'], 'literal');
             //save the SemanticTag with the DataHandler:
             $dh->saveTag($semanticTag);
         } else {
@@ -200,13 +200,13 @@ class SemanticTagsApp implements SemanticTagsEnums
 
             $properties                 = $semanticTag->getAllProperties();
             $currentSemanticDataType    = $semanticTag->getConcept();
-            $currentSemanticDescription = $properties['rdfs:comment'];
+            $currentSemanticDescription = $properties['rdfs:comment']['o'];
             //fill with the conncetions
             $connections = array();
             foreach ($properties as $property => $val) {
-                if ($property != 'rdfs:comment' && $property != 'rdfs:label') {
-                    $conncetions[] = array('property' => $property, 'value' => $val);
-                }
+                //if ($property != 'rdfs:comment' && $property != 'rdfs:label') {
+                $connections[] = array('property' => $property, 'value' => $val);
+                //}
             }
             $currentSemanticConncetions = json_encode($connections);
         }
@@ -215,8 +215,8 @@ class SemanticTagsApp implements SemanticTagsEnums
         echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Datatype', 'semantictags') . '</label></th><td><select name="st_type">' . self::generateDataTypeSelect($currentSemanticDataType) . '</select><p class="description">' . __('The datatype of the tag.', 'semantictags') . '</p></td>
         </tr>';
         echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Description', 'semantictags') . '</label></th><td><textarea name="st_desc">' . $currentSemanticDescription . '</textarea><p class="description">' . __('Internal description for the semantic tag.', 'semantictags') . '</p>
-            <input type="hidden" name="st_connections" value="' . $currentSemanticConncetions . '" /></td>
         </tr>';
+
     }
 
     /**

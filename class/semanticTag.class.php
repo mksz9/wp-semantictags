@@ -64,9 +64,9 @@ class SemanticTag
      * @param string $object
      * @return void
      */
-    public function addProperty($predicate, $object)
+    public function addProperty($predicate, $object, $type)
     {
-        $this->properties[$predicate] = $object;
+        $this->properties[$predicate] = array('o' => $object, 'type' => $type);
     }
 
     /**
