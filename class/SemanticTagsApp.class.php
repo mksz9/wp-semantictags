@@ -16,6 +16,9 @@ class SemanticTagsApp implements SemanticTagsEnums
      */
     public static function main()
     {
+        //to be removed:
+        SemanticTagsHelper::getAllTagsInSelectbox();
+
         $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //check if schema file exists, if not than download it from remote to upload dir
@@ -73,6 +76,8 @@ class SemanticTagsApp implements SemanticTagsEnums
 
         //retrieving all datatypes from vocabulary
         add_action('wp_ajax_semantictags_retrieve_datatypes', array('ConceptTypeChecker', 'getAllConcepts'));
+        //retrieving all tags in a selectbox
+        add_action('wp_ajax_semantictags_retrieve_tags', array('ConceptTypeChecker', 'getAllTags'));
     }
 
     /**
@@ -105,6 +110,7 @@ class SemanticTagsApp implements SemanticTagsEnums
             wp_enqueue_style('semantictags_tagconfigurationonpost_css', plugin_dir_url(SEMANTICTAGS_FILE) . 'css/tagConfiguratorOnPost.css');
         } else if ('edit-tags.php' == $pagenow) {
             wp_enqueue_script('semantictags_tagconfigurationontagedit_js', plugin_dir_url(SEMANTICTAGS_FILE) . 'js/tagConfiguratorOnTagEdit.js');
+            wp_enqueue_style('semantictags_tagconfigurationontagedit_css', plugin_dir_url(SEMANTICTAGS_FILE) . 'css/tagConfiguratorOnTagEdit.css');
         }
     }
 
@@ -152,14 +158,35 @@ class SemanticTagsApp implements SemanticTagsEnums
     {
         $semanticTag = new SemanticTag();
         $dh          = DataHandler::getInstance();
+        $config      = SemanticTagsOptions::getVocabularConfiguration();
+        error_log(print_r($args, 1));
         if (isset($args['st_type']) && $args['st_type'] != '') {
             //set its informations to store:
             $semanticTag->setConcept($args['st_type']);
             $semanticTag->setConceptId($args['term_id']);
             $semanticTag->addProperty('rdfs:label', $args['name'], 'literal');
             $semanticTag->addProperty('rdfs:comment', $args['st_desc'], 'literal');
+            //if properties are set
+            if ($args['st_connection_config'][0] != '') {
+                foreach ($args['st_connection_config'] as $property) {
+                    if ($property != '') {
+                        //unescaping data:
+                        $tempData = str_replace("\\", "", $property);
+                        //decode JSON data:
+                        $data = json_decode($tempData);
+                        $val  = '';
+                        if ($data->o_type == 'literal') {
+                            $val = $data->o;
+                        } else if ($data->o_type == 'uri') {
+                            $val = '<//tag#' . $data->o . '>';
+                        }
+                        $semanticTag->addProperty($config['prefix'] . ':' . $data->p, $val, $data->o_type);
+                    }
+                }
+            }
             //save the SemanticTag with the DataHandler:
             $dh->saveTag($semanticTag);
+
         } else {
             $semanticTag->setConceptId($args['term_id']);
             $dh->deleteTag($semanticTag);
@@ -191,31 +218,47 @@ class SemanticTagsApp implements SemanticTagsEnums
      */
     public static function hookTagEditPage($tag)
     {
-        $dh = DataHandler::getInstance();
+        $dh         = DataHandler::getInstance();
+        $vocabulary = SemanticTagsOptions::getVocabularConfiguration();
 
-        $currentSemanticDataType = $currentSemanticDescription = $currentSemanticConncetions = '';
+        $currentSemanticDataType = $currentSemanticDescription = $properties = '';
 
         //retrieve the semanticTag object to the post tag
         if ($semanticTag = $dh->loadTagByConceptId($tag->term_id)) {
-
-            $properties                 = $semanticTag->getAllProperties();
-            $currentSemanticDataType    = $semanticTag->getConcept();
-            $currentSemanticDescription = $properties['rdfs:comment']['o'];
-            //fill with the conncetions
-            $connections = array();
-            foreach ($properties as $property => $val) {
-                //if ($property != 'rdfs:comment' && $property != 'rdfs:label') {
-                $connections[] = array('property' => $property, 'value' => $val);
-                //}
+            $properties              = $semanticTag->getAllProperties();
+            $currentSemanticDataType = $semanticTag->getConcept();
+            if (isset($properties['rdfs:comment'])) {
+                $currentSemanticDescription = $properties['rdfs:comment']['o'];
             }
-            $currentSemanticConncetions = json_encode($connections);
         }
 
         //output the form fields
-        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Datatype', 'semantictags') . '</label></th><td><select name="st_type">' . self::generateDataTypeSelect($currentSemanticDataType) . '</select><p class="description">' . __('The datatype of the tag.', 'semantictags') . '</p></td>
+        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="type">' . __('Datatype', 'semantictags') . '</label></th><td><select name="st_type">' . self::generateDataTypeSelect($currentSemanticDataType) . '</select><p class="description">' . __('The datatype of the tag.', 'semantictags') . '</p></td>
         </tr>';
-        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Description', 'semantictags') . '</label></th><td><textarea name="st_desc">' . $currentSemanticDescription . '</textarea><p class="description">' . __('Internal description for the semantic tag.', 'semantictags') . '</p>
+        echo '<tr class="form-field term-description-wrap"><th scope="row"><label for="description">' . __('Description', 'semantictags') . '</label></th><td><textarea name="st_desc">' . $currentSemanticDescription . '</textarea><p class="description">' . __('Internal description for the semantic tag.', 'semantictags') . '</p></td>
         </tr>';
+
+        echo '<tr class="form-field term-description-wrap"><th scrope="row"><label for="conncetion">' . __('Connection', 'semantictags') . '</label></th><td>';
+
+        if ($properties != '') {
+            foreach ($properties as $p => $o) {
+                if ($p != 'rdfs:comment' && $p != 'rdfs:label') {
+                    echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><input type="text" name="st_connection_predicate" placeholder="' . __('Predicate', 'semantictags') . '" value="' . str_replace($vocabulary['prefix'] . ':', '', $p) . '"><select name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal"' . (($o['type'] == 'literal') ? ' selected' : '') . '>' . __('Literal', 'semantictags') . '</option><option value="uri"' . (($o['type'] == 'uri') ? ' selected' : '') . '>' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper">';
+                    switch ($o['type']) {
+                        case 'literal':
+                            echo '<input type="text" name="st_connection_object_val" value="' . $o['o'] . '">';
+                            break;
+                        case 'uri':
+                            echo SemanticTagsHelper::getAllTagsInSelectbox($o['o']);
+                            break;
+                    }
+                    echo '</div><div class="st_line_buttons"></div></div>';
+                }
+            }
+        }
+        echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><input type="text" name="st_connection_predicate" placeholder="' . __('Predicate', 'semantictags') . '"><select  name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal">' . __('Literal', 'semantictags') . '</option><option value="uri">' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper"></div><div class="st_line_buttons"></div></div>';
+        echo '</td></tr>';
+        echo '<tr><td></td><td><p class="description">' . __('Here you can configurate the properties. Choose a predicate and give it a object.', 'semantictags') . '</p></td></tr>';
 
     }
 

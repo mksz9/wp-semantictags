@@ -76,4 +76,23 @@ class SemanticTagsHelper implements SemanticTagsEnums
         }
         return $semanticTags;
     }
+
+    public static function getAllTagsInSelectbox($active = null)
+    {
+        if (null !== $active) {
+            $id = str_replace('http://tag#', '', $active);
+        } else {
+            $id = -1;
+        }
+
+        $tags = get_tags(array(
+            'hide_empty' => false,
+        ));
+        $output = '<select name="st_connections_object_uri"><option value=""></option>';
+        foreach ($tags as $tag) {
+            $output .= '<option value="' . $tag->term_id . '"' . (($id == $tag->term_id) ? ' selected' : '') . '>' . $tag->name . '</option>';
+        }
+        $output .= '</select>';
+        return $output;
+    }
 }

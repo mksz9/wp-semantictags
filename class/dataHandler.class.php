@@ -38,9 +38,9 @@ class DataHandler
 
         //when tag already exists and concept changes, then remove existing entries and properties
         if ($stored = $this->loadTagByConceptId($tag->getConceptId())) {
-            if ($stored->getConcept() != $tag->getConcept()) {
-                $this->deleteTag($stored);
-            }
+            //if ($stored->getConcept() != $tag->getConcept()) {
+            $this->deleteTag($stored);
+            //}
             /**
              * ToDo:
              * Wenn ein neuer Eintrag mit Beziehungen kommt (editing im Tagbearbeitungsmenü), dann nur Beziehungen die zum Tag konfiguriert wurden speichern - vorab alle anderen löschen
@@ -55,19 +55,27 @@ class DataHandler
 
         //inserting all properties of the tag
         foreach ($tag->getAllProperties() as $property_p => $property_o) {
+            $o = '';
+            if ($property_o['type'] == 'literal') {
+                $o = '"' . $property_o['o'] . '"';
+            } else if ($property_o['type'] == 'uri') {
+                $o = $property_o['o'];
+            }
             $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                 INSERT INTO <//tag> {
-                <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' "' . $property_o['o'] . '"}';
-            $store->query($query);
+                <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' ' . $o . '}';
         }
+
+        error_log($query);
+        $store->query($query);
     }
 
-    /**
-     * Removes a SemanticTag object from the database
-     * @param SemanticTag $tag
-     * @param string $property optional - whether removing only property from a tag
-     * @return void
-     */
+/**
+ * Removes a SemanticTag object from the database
+ * @param SemanticTag $tag
+ * @param string $property optional - whether removing only property from a tag
+ * @return void
+ */
     public function deleteTag(SemanticTag $tag, $property = null)
     {
         $store = SemanticTagsHelper::getARC2Store();
@@ -75,11 +83,11 @@ class DataHandler
         $store->query($query);
     }
 
-    /**
-     * Checks whether a conceptId is already stored
-     * @param integer $conceptId
-     * @return boolean
-     */
+/**
+ * Checks whether a conceptId is already stored
+ * @param integer $conceptId
+ * @return boolean
+ */
     public function conceptIdExists($conceptId)
     {
         $store     = SemanticTagsHelper::getARC2Store();
@@ -94,11 +102,11 @@ class DataHandler
         return (count($result['result']['rows']) > 0);
     }
 
-    /**
-     * Loads an existing existing SemanticTag based on a conceptId
-     * @param int $conceptId The ID of the concept to load
-     * @return SemanticTag|boolean
-     */
+/**
+ * Loads an existing existing SemanticTag based on a conceptId
+ * @param int $conceptId The ID of the concept to load
+ * @return SemanticTag|boolean
+ */
     public function loadTagByConceptId($conceptId)
     {
         $store     = SemanticTagsHelper::getARC2Store();
@@ -121,6 +129,8 @@ class DataHandler
         //setting the conceptId in the object
         $semanticTag->setConceptId($conceptId);
 
+        error_log(print_r($result, 1));
+
         /**
          * ToDo:
          * -check type (if (is 'uri')...)
@@ -136,6 +146,9 @@ class DataHandler
                     break;
                 case 'http://www.w3.org/2000/01/rdf-schema#comment':
                     $semanticTag->addProperty('rdfs:comment', $row['o'], $row['o type']);
+                    break;
+                default:
+                    $semanticTag->addProperty(str_replace($vocabular['uri'], $vocabular['prefix'] . ':', $row['p']), $row['o'], $row['o type']);
                     break;
             }
         }

@@ -1,0 +1,12 @@
+.st_connection_wrapper {
+	margin-bottom: 15px;
+}
+.st_connection_wrapper input, .st_connection_wrapper select, .st_connection_value_wrapper {
+    width: 25% !important;
+}
+.st_connection_value_wrapper, .st_line_buttons {
+	display: inline;
+}
+.st_line_buttons a {
+	text-decoration: none;
+}

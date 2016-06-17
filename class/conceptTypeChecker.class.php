@@ -7,6 +7,10 @@ if (!function_exists('add_filter')) {
     exit();
 }
 
+/**
+ * ToDo:
+ * -Remove interface, rename "TypeChecker" and remove PropertytypeChecker
+ */
 class ConceptTypeChecker implements TypeChecker
 {
     public function check()
@@ -22,6 +26,13 @@ class ConceptTypeChecker implements TypeChecker
     {
         $conceptClasses = SemanticTagsHelper::getVocabularyClasses();
         echo json_encode($conceptClasses);
+        die();
+    }
+
+    public static function getAllTags()
+    {
+        $tags = SemanticTagsHelper::getAllTagsInSelectbox();
+        echo json_encode($tags);
         die();
     }
 }
