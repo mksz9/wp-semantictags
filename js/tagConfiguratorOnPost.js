@@ -171,5 +171,6 @@ function renderTypeOptions(overlay, currentType, datatypes) {
 }
 //retrieves the tag name of a current wrapped span element where the tag name is natively implemented
 function getTagFromElement(elem) {
-    return elem[0].outerText.substring(6);
+    var splitted = elem[0].outerText.split(" ");
+    return splitted[1];
 }
