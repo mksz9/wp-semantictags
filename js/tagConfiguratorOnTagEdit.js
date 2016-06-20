@@ -1,5 +1,7 @@
+//do some actions, when DOM has loaded
 jQuery(document).ready(function() {
     var propertyLine = jQuery('.st_connection_wrapper:last-child');
+    //get list of all possible tags, for dropdown field if connection should be an uri
     jQuery.ajax({
         type: 'POST',
         url: ajaxurl,
@@ -11,6 +13,7 @@ jQuery(document).ready(function() {
         },
         async: false
     });
+    //event handler, when new line for a connection should be added
     jQuery('.st_connection_add_line').live('click', function(e) {
         e.preventDefault();
         newPropertyLine = propertyLine.clone();
@@ -18,12 +21,15 @@ jQuery(document).ready(function() {
         jQuery('<div class="st_connection_wrapper">' + newPropertyLine.html() + '</div>').insertAfter('.st_connection_wrapper:last-child');
         setLineButtons();
     });
+    //event handler, when a connection row should be removed
     jQuery('.st_connection_remove_line').live('click', function(e) {
         e.preventDefault();
         jQuery(this).parent().parent().remove();
         setLineButtons();
     });
+    //re-transform the delete and new line buttons
     setLineButtons();
+    //switch between textinput and select when adding a new connection with its predicate type
     jQuery('select[name="st_connection_object_type"]').live('change', function() {
         var selection = jQuery(this).val();
         if (selection == 'literal') {
@@ -34,6 +40,7 @@ jQuery(document).ready(function() {
             jQuery(this).parent().find('.st_connection_value_wrapper').html('');
         }
     });
+    //re-render all hidden fields by its connection configuration before submitting the form
     jQuery('input[name="submit"]').live('hover', function() {
         jQuery('.st_connection_wrapper').each(function() {
             data = {};

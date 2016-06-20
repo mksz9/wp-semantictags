@@ -43,7 +43,7 @@ class DataHandler
             //}
             /**
              * ToDo:
-             * Wenn ein neuer Eintrag mit Beziehungen kommt (editing im Tagbearbeitungsmenü), dann nur Beziehungen die zum Tag konfiguriert wurden speichern - vorab alle anderen löschen
+             * - Bei deleteConnections false: alle anderen sachen außer connections löschen (die werden wieder neu gesetzt, dient dazu um duplikate im tripel store zu vermeiden)
              */
         }
 
