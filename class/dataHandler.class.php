@@ -31,13 +31,13 @@ class DataHandler
      * @param SemanticTag $tag
      * @return void
      */
-    public function saveTag(SemanticTag $tag)
+    public function saveTag(SemanticTag $tag, $deleteConnections = false)
     {
         $store     = SemanticTagsHelper::getARC2Store();
         $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //when tag already exists and concept changes, then remove existing entries and properties
-        if ($stored = $this->loadTagByConceptId($tag->getConceptId())) {
+        if (($stored = $this->loadTagByConceptId($tag->getConceptId())) && $deleteConnections) {
             //if ($stored->getConcept() != $tag->getConcept()) {
             $this->deleteTag($stored);
             //}
@@ -64,10 +64,9 @@ class DataHandler
             $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                 INSERT INTO <//tag> {
                 <//tag#' . $tag->getConceptId() . '> ' . $property_p . ' ' . $o . '}';
-        }
 
-        error_log($query);
-        $store->query($query);
+            $store->query($query);
+        }
     }
 
 /**
@@ -128,8 +127,6 @@ class DataHandler
 
         //setting the conceptId in the object
         $semanticTag->setConceptId($conceptId);
-
-        error_log(print_r($result, 1));
 
         /**
          * ToDo:

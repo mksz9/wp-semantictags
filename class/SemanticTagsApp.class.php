@@ -130,14 +130,14 @@ class SemanticTagsApp implements SemanticTagsEnums
 
             foreach ($postedSemanticTagData as $data) {
                 //get the tag information to each configured SemanticTag:
-                $term = get_term_by('name', $data->name, 'post_tag');
+                $term = get_term_by('name', $data->name->o, 'post_tag');
                 //create the new SemanticTag object which gets stored:
                 $semanticTag = new SemanticTag();
                 //set its informations to store:
                 $semanticTag->setConcept($data->type);
                 $semanticTag->setConceptId($term->term_id);
-                $semanticTag->addProperty('rdfs:label', $data->name, 'literal');
-                $semanticTag->addProperty('rdfs:comment', $data->desc, 'literal');
+                $semanticTag->addProperty('rdfs:label', $data->name->o, 'literal');
+                $semanticTag->addProperty('rdfs:comment', $data->desc->o, 'literal');
                 //save the SemanticTag with the DataHandler:
                 $dh = DataHandler::getInstance();
                 $dh->saveTag($semanticTag);
@@ -159,7 +159,6 @@ class SemanticTagsApp implements SemanticTagsEnums
         $semanticTag = new SemanticTag();
         $dh          = DataHandler::getInstance();
         $config      = SemanticTagsOptions::getVocabularConfiguration();
-        error_log(print_r($args, 1));
         if (isset($args['st_type']) && $args['st_type'] != '') {
             //set its informations to store:
             $semanticTag->setConcept($args['st_type']);
@@ -185,7 +184,7 @@ class SemanticTagsApp implements SemanticTagsEnums
                 }
             }
             //save the SemanticTag with the DataHandler:
-            $dh->saveTag($semanticTag);
+            $dh->saveTag($semanticTag, true);
 
         } else {
             $semanticTag->setConceptId($args['term_id']);

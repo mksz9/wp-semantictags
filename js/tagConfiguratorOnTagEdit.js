@@ -34,26 +34,20 @@ jQuery(document).ready(function() {
             jQuery(this).parent().find('.st_connection_value_wrapper').html('');
         }
     });
-    //jQuery('input[name="submit"]').click(function(e) {
-
-        jQuery('.st_connection_wrapper').live('change', function() {
+    jQuery('input[name="submit"]').live('hover', function() {
+        jQuery('.st_connection_wrapper').each(function() {
             data = {};
             data.o = '';
             data.p = jQuery(this).find('input[name="st_connection_predicate"]').val();
             data.o_type = jQuery(this).find('select[name="st_connection_object_type"]').val();
-            console.log("o_type: "+data.o_type);
-            console.log("now checking o_type");
             if (data.o_type == 'uri') {
-                console.log("is uri");
                 data.o = jQuery(this).find('select[name="st_connections_object_uri"]').val();
             } else if (data.o_type == 'literal') {
-                console.log("is literal")
                 data.o = jQuery(this).find('input[name="st_connection_object_val"]').val();
             }
-            console.log(data);
             jQuery(this).find('input[name="st_connection_config[]"]').val(JSON.stringify(data));
         });
-
+    });
 });
 
 function setLineButtons() {

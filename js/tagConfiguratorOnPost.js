@@ -17,9 +17,15 @@
 })(jQuery)
 //struct for a semanticTag on frontend
 function semanticTag(name, type, desc) {
-    this.name = name;
+    this.name = {
+        'o': name,
+        'type': 'literal',
+    }
     this.type = type;
-    this.desc = desc;
+    this.desc = {
+        'o': desc,
+        'type': 'literal',
+    }
 }
 //class to handle semanticData information
 var semanticData = {
@@ -31,9 +37,9 @@ var semanticData = {
                     this.removeTag(name);
                 }
                 i = this.getTagIndex(name);
-                this.tags[i].name = name;
+                this.tags[i].name.o = name;
                 this.tags[i].type = type;
-                this.tags[i].desc = desc;
+                this.tags[i].desc.o = desc;
             } else {
                 if (type != null) {
                     this.tags.push(new semanticTag(name, type, desc));
@@ -49,13 +55,13 @@ var semanticData = {
             this.tags = new Array();
             var tagsRaw = JSON.parse(elem.val());
             for (var i = 0; i < tagsRaw.length; i++) {
-                this.tags.push(new semanticTag(tagsRaw[i].name, tagsRaw[i].type, tagsRaw[i].desc));
+                this.tags.push(new semanticTag(tagsRaw[i].name.o, tagsRaw[i].type, tagsRaw[i].desc.o));
             }
         },
         //checks if a tag exists in the current collection
         hasTag: function(name) {
             for (var i = 0; i < this.tags.length; i++) {
-                if (this.tags[i].name == name) {
+                if (this.tags[i].name.o == name) {
                     return true;
                 }
             }
@@ -64,7 +70,7 @@ var semanticData = {
         //returns a tag by its name
         getTag: function(name) {
             for (var i = 0; i < this.tags.length; i++) {
-                if (this.tags[i].name == name) {
+                if (this.tags[i].name.o == name) {
                     return this.tags[i];
                 }
             }
@@ -73,7 +79,7 @@ var semanticData = {
         //returns the index of tag by its name
         getTagIndex: function(name) {
             for (var i = 0; i < this.tags.length; i++) {
-                if (this.tags[i].name == name) {
+                if (this.tags[i].name.o == name) {
                     return i;
                 }
             }
@@ -118,7 +124,7 @@ jQuery(document).ready(function() {
         if (semanticData.hasTag(tagName)) {
             tagsData = semanticData.getTag(tagName);
             val.type = tagsData.type;
-            val.desc = tagsData.desc;
+            val.desc = tagsData.desc.o;
         }
         semanticEditOverlay = jQuery('<div class="semanticeditoverlay" data-tagname="' + tagName + '"><a class="closeoverlay">X</a><h4>' + objectL10n.overlay_headline + '</h4><table cellpadding="0" cellspacing="0"><tr><td>' + objectL10n.semantictag_name + ':</td><td>' + tagName + '</td></tr></table></div>')
         semanticEditOverlay.find('table').append('<tr><td>' + objectL10n.semantictag_type + ':</td><td><select name="type"><option value="" disabled></option></select></td></tr>');
