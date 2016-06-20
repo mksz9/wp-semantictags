@@ -77,6 +77,11 @@ class SemanticTagsHelper implements SemanticTagsEnums
         return $semanticTags;
     }
 
+    /**
+     * Retrieves all active tags for a selection as uri
+     * @param boolean|null $active
+     * @return string
+     */
     public static function getAllTagsInSelectbox($active = null)
     {
         if (null !== $active) {
@@ -89,6 +94,7 @@ class SemanticTagsHelper implements SemanticTagsEnums
             'hide_empty' => false,
         ));
         $output = '<select name="st_connections_object_uri"><option value=""></option>';
+        //generating output
         foreach ($tags as $tag) {
             $output .= '<option value="' . $tag->term_id . '"' . (($id == $tag->term_id) ? ' selected' : '') . '>' . $tag->name . '</option>';
         }
