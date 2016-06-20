@@ -65,6 +65,7 @@ function semantictags_auto_load($class)
             'SemanticTagsSetup'   => SEMANTICTAGS_PATH . 'class/SemanticTagsSetup.class.php',
             'TypeChecker'         => SEMANTICTAGS_PATH . 'interface/TypeChecker.interface.php',
             'SemanticTagsEnums'   => SEMANTICTAGS_PATH . 'interface/SemanticTagsEnums.interface.php',
+            'SearchAlgorithm'     => SEMANTICTAGS_PATH . 'interface/SearchAlgorithm.interface.php',
         );
     }
 

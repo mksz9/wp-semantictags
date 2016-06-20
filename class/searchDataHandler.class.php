@@ -7,15 +7,62 @@ if (!function_exists('add_filter')) {
     exit();
 }
 
-class SearchDataHandler extends DataHandler
+class SearchDataHandler extends DataHandler implements SearchAlgorithm
 {
+
     /**
-     * Searches in concepts on a given keyword
-     * @param string $keyword
-     * @return SemanticTag
+     * Returns a singleton instance of SearchDataHandler object
+     * @return DataHandler
      */
-    public function getDataByKeyword(string $keyword)
+    public static function getInstance()
     {
+        if (null === self::$instance) {
+            self::$instance = new self;
+        }
+        return self::$instance;
+    }
+
+    /**
+     * Searches in concepts on a given keyword and gives relevant concepts
+     * @param string $keyword
+     * @return array
+     */
+    public static function searchConceptsByKeyword($keyword)
+    {
+        $store     = SemanticTagsHelper::getARC2Store();
+        $vocabular = SemanticTagsOptions::getVocabularConfiguration();
+
+        $returnConcepts = array();
+
+        //lookup for the keyword
+        $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
+                SELECT *
+                WHERE { ?s ?p "' . $keyword . '"}';
+        $concepts        = $store->query($query);
+        $conceptsResults = $concepts['result']['rows'];
+
+        //check if something could be found
+        if (count($conceptsResults) != 0) {
+            foreach ($conceptsResults as $conceptsResult) {
+                //check if the result is property of a tag
+                if (preg_match('@http://tag#([0-9]*)@', $conceptsResult['s'], $matches)) {
+                    $tagId = $matches[1];
+                    $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
+                        SELECT *
+                        WHERE { <//tag#' . $tagId . '> ?p ?o
+                        }';
+                    $relations       = $store->query($query);
+                    $relationResults = $relations['result']['rows'];
+                    foreach ($relationResults as $relationResult) {
+                        if ($relationResult['o type'] == 'uri' && (preg_match('@http://tag#([0-9]*)@', $relationResult['o'], $matches))) {
+                            $returnConcepts[] = $matches[1];
+                        }
+                    }
+                }
+            }
+            return array_unique($returnConcepts);
+        }
 
     }
+
 }

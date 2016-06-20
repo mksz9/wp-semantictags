@@ -58,6 +58,9 @@ class SemanticTagsApp implements SemanticTagsEnums
         //save semanticTags options on tag editing page
         add_filter('wp_update_term_parent', array('SemanticTagsApp', 'processSemanticTagsOnTagEdit'), 10, 5);
 
+        //add filter for search
+        add_filter('pre_get_posts', array('SemanticTagsApp', 'manipulateSearch'));
+
         //on plugin activation (create db tables)
         register_activation_hook(SEMANTICTAGS_FILE, array(
             'SemanticTagsSetup',
@@ -276,6 +279,23 @@ class SemanticTagsApp implements SemanticTagsEnums
             $returnOptions .= '<option value="' . $class . '"' . $selected . '>' . $splitted[1] . '</option>';
         }
         return $returnOptions;
+    }
+
+    /**
+     * Hook for the wordpress search. Provides a manipulation of the returned post objects
+     * @param WP_Query $query
+     * @return WP_Query
+     */
+    public static function manipulateSearch($query)
+    {
+        if (!$query->is_search()) {
+            $searchKey       = sanitize_text_field(get_search_query());
+            $searchAlgorithm = SearchDataHandler::getInstance();
+            $relevantTags    = $searchAlgorithm->searchConceptsByKeyword($searchKey);
+            //... build score based on this tags
+            error_log(print_r($relevantTags, 1));
+        }
+        return $query;
     }
 
 }
