@@ -46,13 +46,16 @@ class SearchDataHandler extends DataHandler implements SearchAlgorithm
             foreach ($conceptsResults as $conceptsResult) {
                 //check if the result is property of a tag
                 if (preg_match('@http://tag#([0-9]*)@', $conceptsResult['s'], $matches)) {
+                    //the tag ID (concept ID) where the keyword is present
                     $tagId = $matches[1];
+                    //make a query for all relational concepts of this found concept
                     $query = 'prefix ' . $vocabular['prefix'] . ': <' . $vocabular['uri'] . '>
                         SELECT *
                         WHERE { <//tag#' . $tagId . '> ?p ?o
                         }';
                     $relations       = $store->query($query);
                     $relationResults = $relations['result']['rows'];
+                    //store all relational concept ID's in array
                     foreach ($relationResults as $relationResult) {
                         if ($relationResult['o type'] == 'uri' && (preg_match('@http://tag#([0-9]*)@', $relationResult['o'], $matches))) {
                             $returnConcepts[] = $matches[1];
@@ -60,7 +63,8 @@ class SearchDataHandler extends DataHandler implements SearchAlgorithm
                     }
                 }
             }
-            return array_unique($returnConcepts);
+            //return all concepts - duplicates may happen, that's achieved
+            return $returnConcepts;
         }
 
     }

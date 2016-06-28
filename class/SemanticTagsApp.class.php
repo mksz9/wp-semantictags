@@ -16,9 +16,6 @@ class SemanticTagsApp implements SemanticTagsEnums
      */
     public static function main()
     {
-        //to be removed:
-        SemanticTagsHelper::getAllTagsInSelectbox();
-
         $vocabular = SemanticTagsOptions::getVocabularConfiguration();
 
         //check if schema file exists, if not than download it from remote to upload dir
@@ -265,7 +262,7 @@ class SemanticTagsApp implements SemanticTagsEnums
     }
 
     /**
-     * Generates the select input depending on the current choosed datatype + all available datatypes in vocabulary
+     * Generates the select input depending on the current choosen datatype + all available datatypes in vocabulary
      * @param string $current
      * @return string
      */
@@ -288,14 +285,24 @@ class SemanticTagsApp implements SemanticTagsEnums
      */
     public static function manipulateSearch($query)
     {
-        if (!$query->is_search()) {
+        if ($query->is_search()) {
             $searchKey       = sanitize_text_field(get_search_query());
             $searchAlgorithm = SearchDataHandler::getInstance();
-            $relevantTags    = $searchAlgorithm->searchConceptsByKeyword($searchKey);
-            //... build score based on this tags
-            error_log(print_r($relevantTags, 1));
-        }
-        return $query;
-    }
+            //get related tag ID's to query
+            $relevantTags = $searchAlgorithm->searchConceptsByKeyword($searchKey);
 
+            //if semantic search got results:
+            if (count($relevantTags) > 0) {
+                //count appearance of tag ids
+                $relevantTags = array_count_values($relevantTags);
+                //tell the query to return all posts within the given tag IDs
+                $tagIds = array();
+                foreach ($relevantTags as $key => $val) {
+                    $tagIds[] = $key;
+                }
+                $query->set('s', '');
+                $query->set('tag__in', $tagIds);
+            }
+        }
+    }
 }
