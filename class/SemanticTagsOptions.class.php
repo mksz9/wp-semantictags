@@ -69,19 +69,19 @@ class SemanticTagsOptions
     public static function renderUri()
     {
         $options = get_option('semantictags_settings_vocabulary');
-        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_uri]"" value="' . $options['semantictags_settings_vocabulary_uri'] . '">';
+        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_uri]"" value="' . $options['semantictags_settings_vocabulary_uri'] . '"><p class="description">' . __('Example', 'semantictags') . ': http://schema.org/</p>';
     }
 
     public static function renderPrefix()
     {
         $options = get_option('semantictags_settings_vocabulary');
-        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_prefix]"" value="' . $options['semantictags_settings_vocabulary_prefix'] . '">';
+        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_prefix]"" value="' . $options['semantictags_settings_vocabulary_prefix'] . '"><p class="description">' . __('Example', 'semantictags') . ': schema</p>';
     }
 
     public static function renderTtl()
     {
         $options = get_option('semantictags_settings_vocabulary');
-        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_ttl]"" value="' . $options['semantictags_settings_vocabulary_ttl'] . '">';
+        echo '<input type="text" name="semantictags_settings_vocabulary[semantictags_settings_vocabulary_ttl]"" value="' . $options['semantictags_settings_vocabulary_ttl'] . '"><p class="description">' . __('Example', 'semantictags') . ': https://ckannet-storage.commondatastorage.googleapis.com/2015-03-18T17:25:40.358Z/schema-org.ttl</p>';
     }
 
     public static function renderSectionVocabular()
