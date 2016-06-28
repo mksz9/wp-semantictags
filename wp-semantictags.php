@@ -15,16 +15,6 @@ if (!function_exists('add_filter')) {
 }
 
 /**
- * ToDo:
- * - refactoring:
- *      - move out all functions from app, where it is possible
- *      - look how could be .rdf + .ttl integrated
- *      - filepath of voc generation made easier at central place
- *      - check if voc is there and give user feedback if not - dont let him work with plugin if no voc is defined
- *      - add comments to all new classes / methods
- */
-
-/**
  * Defining of some constants which are used in the plugin
  */
 
