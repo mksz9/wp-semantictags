@@ -11,13 +11,8 @@ if (!function_exists('add_filter')) {
  * ToDo:
  * -Remove interface, rename "TypeChecker" and remove PropertytypeChecker
  */
-class ConceptTypeChecker implements TypeChecker
+class ConceptTypeChecker
 {
-    public function check()
-    {
-
-    }
-
     /**
      * Retrieving all concepts from used vocabulary
      * @return void
