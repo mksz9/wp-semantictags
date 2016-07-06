@@ -286,8 +286,20 @@ class SemanticTagsApp implements SemanticTagsEnums
     public static function manipulateSearch($query)
     {
         if ($query->is_search()) {
-            $searchKey       = sanitize_text_field(get_search_query());
-            $searchAlgorithm = SearchDataHandler::getInstance();
+            $searchKey = sanitize_text_field(get_search_query());
+
+            /**
+             * Instanciating the searchAlgorithm
+             * Can be hooked with filter 'semantictags_set_searchalgorithm' and has to be type of SearchAlgorithm Interface
+             */
+            $searchAlgorithm = '';
+            $searchAlgorithm = apply_filters('semantictags_set_searchalgorithm', $searchAlgorithm);
+
+            //if no custom SearchAlgorithm had been injected, then use the standard one
+            if (!($searchAlgorithm instanceof SearchAlgorithm)) {
+                $searchAlgorithm = SearchDataHandler::getInstance();
+            }
+
             //get related tag ID's to query
             $relevantTags = $searchAlgorithm->searchConceptsByKeyword($searchKey);
 
@@ -300,6 +312,7 @@ class SemanticTagsApp implements SemanticTagsEnums
                 foreach ($relevantTags as $key => $val) {
                     $tagIds[] = $key;
                 }
+                //removing native search query
                 $query->set('s', '');
                 $query->set('tag__in', $tagIds);
             }
