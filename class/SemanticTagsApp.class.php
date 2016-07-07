@@ -242,7 +242,7 @@ class SemanticTagsApp implements SemanticTagsEnums
         if ($properties != '') {
             foreach ($properties as $p => $o) {
                 if ($p != 'rdfs:comment' && $p != 'rdfs:label') {
-                    echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><input type="text" name="st_connection_predicate" placeholder="' . __('Predicate', 'semantictags') . '" value="' . str_replace($vocabulary['prefix'] . ':', '', $p) . '"><select name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal"' . (($o['type'] == 'literal') ? ' selected' : '') . '>' . __('Literal', 'semantictags') . '</option><option value="uri"' . (($o['type'] == 'uri') ? ' selected' : '') . '>' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper">';
+                    echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><select name="st_connection_predicate"><option value="" selected>' . __('Predicate', 'semantictags') . '</option>' . self::generateDataPropertySelect(str_replace($vocabulary['prefix'] . ':', '', $p)) . '</select><select name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal"' . (($o['type'] == 'literal') ? ' selected' : '') . '>' . __('Literal', 'semantictags') . '</option><option value="uri"' . (($o['type'] == 'uri') ? ' selected' : '') . '>' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper">';
                     switch ($o['type']) {
                         case 'literal':
                             echo '<input type="text" name="st_connection_object_val" value="' . $o['o'] . '">';
@@ -255,7 +255,7 @@ class SemanticTagsApp implements SemanticTagsEnums
                 }
             }
         }
-        echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><input type="text" name="st_connection_predicate" placeholder="' . __('Predicate', 'semantictags') . '"><select  name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal">' . __('Literal', 'semantictags') . '</option><option value="uri">' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper"></div><div class="st_line_buttons"></div></div>';
+        echo '<div class="st_connection_wrapper"><input type="hidden" name="st_connection_config[]" value=""><select name="st_connection_predicate"><option value="" selected>' . __('Predicate', 'semantictags') . '</option>' . self::generateDataPropertySelect('') . '</select><select name="st_connection_object_type"><option value="" selected>' . __('choose...', 'semantictags') . '</option><option value="literal">' . __('Literal', 'semantictags') . '</option><option value="uri">' . __('URI', 'semantictags') . '</option></select><div class="st_connection_value_wrapper"></div><div class="st_line_buttons"></div></div>';
         echo '</td></tr>';
         echo '<tr><td></td><td><p class="description">' . __('Here you can configurate the properties. Choose a predicate and give it a object.', 'semantictags') . '</p></td></tr>';
 
@@ -274,6 +274,22 @@ class SemanticTagsApp implements SemanticTagsEnums
             $splitted = explode(':', $class);
             $selected = ($class == $current) ? ' selected' : '';
             $returnOptions .= '<option value="' . $class . '"' . $selected . '>' . $splitted[1] . '</option>';
+        }
+        return $returnOptions;
+    }
+
+    /**
+     * Generates the select input depending on the current choosen property + all available properties in vocabulary
+     * @param string $current
+     * @return string
+     */
+    public static function generateDataPropertySelect($current)
+    {
+        $vocabularyProperties = SemanticTagsHelper::getVocabularyProperties();
+        $returnOptions        = '';
+        foreach ($vocabularyProperties as $property) {
+            $selected = ($property == $current) ? ' selected' : '';
+            $returnOptions .= '<option value="' . $property . '"' . $selected . '>' . $property . '</option>';
         }
         return $returnOptions;
     }

@@ -58,6 +58,31 @@ class SemanticTagsHelper implements SemanticTagsEnums
     }
 
     /**
+     * Returns all properties of the configured vocabulary in alphabetical order
+     * @return array
+     */
+    public static function getVocabularyProperties()
+    {
+        $vocabular              = SemanticTagsOptions::getVocabularConfiguration();
+        $semanticVocabularyFile = SEMANTICTAGS_PATH . SemanticTagsEnums::UPLOAD_DIR . SEMANTICTAGS_PLUGIN_NAME . '/' . $vocabular['prefix'] . '.ttl';
+        //get the ARC2 parser and parse the vocabulary
+        $parser = ARC2::getRDFParser();
+        $parser->parse($semanticVocabularyFile);
+        $triples    = $parser->getTriples();
+        $properties = array();
+        foreach ($triples as $triple) {
+            //only extract informations where predicate is declared as a RDF Type and the object is type of a RDF Property
+            if ($triple['p'] == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#type' && $triple['o'] == 'http://www.w3.org/1999/02/22-rdf-syntax-ns#Property') {
+                $properties[] = substr($triple['s'], strlen($vocabular['uri']));
+            }
+        }
+        //eliminate duplicate entries (maybe possible at some vocabularies), and sort them before returning:
+        $properties = array_unique($properties);
+        sort($properties);
+        return $properties;
+    }
+
+    /**
      * Fetches all SemanticTags by a given post ID
      * @param integer $id
      * @return array

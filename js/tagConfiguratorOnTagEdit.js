@@ -45,7 +45,7 @@ jQuery(document).ready(function() {
         jQuery('.st_connection_wrapper').each(function() {
             data = {};
             data.o = '';
-            data.p = jQuery(this).find('input[name="st_connection_predicate"]').val();
+            data.p = jQuery(this).find('select[name="st_connection_predicate"]').val();
             data.o_type = jQuery(this).find('select[name="st_connection_object_type"]').val();
             if (data.o_type == 'uri') {
                 data.o = jQuery(this).find('select[name="st_connections_object_uri"]').val();
